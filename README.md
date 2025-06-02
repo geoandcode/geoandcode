@@ -1,4 +1,4 @@
-# Karten - Sehenswürdigkeiten Italien
+# Sehenswürdigkeiten Italien
 
 ### Rom
 
