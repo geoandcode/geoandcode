@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <title>Top 10 Sehenswürdigkeiten in Bari</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+        #map {
+            width: 100%;
+            height: 100vh;
+        }
+        .landmark-info {
+            max-width: 250px;
+        }
+        .landmark-info h3 {
+            margin-top: 0;
+            color: #2c3e50;
+        }
+        .yellow-marker {
+            position: absolute;
+            width: 24px;
+            height: 24px;
+            left: -12px;
+            top: -12px;
+            transform: rotate(45deg);
+            background: #FFD700;
+            border: 2px solid #FFA500;
+            border-radius: 24px 24px 0;
+        }
+        .yellow-marker::after {
+            content: "";
+            width: 10px;
+            height: 10px;
+            margin: 7px 0 0 7px;
+            background: #FFFFFF;
+            position: absolute;
+            border-radius: 50%;
+        }
+        .copyright {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            background: rgba(255, 255, 255, 0.7);
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 0.8em;
+            z-index: 1000;
+        }
+        .leaflet-control-layers {
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 5px;
+            padding: 5px;
+        }
+        .map-title {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            font-size: 1.5em;
+            font-weight: bold;
+            text-shadow: 1px 1px 2px white;
+            padding: 8px 15px;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 5px;
+            white-space: nowrap;
+            transition: opacity 0.3s ease;
+        }
+        .map-title.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        /* Subtle scale bar styling */
+        .leaflet-control-scale {
+            background: none;
+            border: none;
+            box-shadow: none;
+            margin-bottom: 5px;
+            margin-right: 5px;
+        }
+        .leaflet-control-scale-line {
+            background: rgba(255, 255, 255, 0.5);
+            border: 1px solid #777;
+            border-top: none;
+            color: #333;
+            font-size: 0.7em;
+            line-height: 1.1;
+            padding: 2px 4px;
+        }
+        @media (max-width: 768px) and (orientation: portrait) {
+            .map-title {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+    <div class="map-title">Top 10 Sehenswürdigkeiten in Bari</div>
+    <div class="copyright">©Stefan Georg Ackermann</div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    
+    <script>
+        // Karte zentriert auf Bari
+        const map = L.map('map').setView([41.1258, 16.8624], 14);
+        const titleElement = document.querySelector('.map-title');
+
+        // Kartenlayer definieren
+        const satelliteLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+            attribution: 'Kartenbild © Esri',
+            name: 'Satellitenansicht'
+        });
+
+        const osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> Mitwirkende',
+            name: 'Straßenkarte'
+        });
+
+        // Standardmäßig Satellitenlayer anzeigen
+        satelliteLayer.addTo(map);
+
+        // Layer-Steuerung hinzufügen
+        const baseLayers = {
+            "Satellitenansicht": satelliteLayer,
+            "OpenStreetMap": osmLayer
+        };
+        
+        L.control.layers(baseLayers, null, {position: 'topright'}).addTo(map);
+
+        // Subtile Maßstabsleiste in Kilometern (unten rechts)
+        L.control.scale({
+            position: 'bottomright',
+            metric: true,
+            imperial: false,
+            maxWidth: 100
+        }).addTo(map);
+
+        // Top 10 Sehenswürdigkeiten in Bari
+        const landmarks = [
+            {
+                name: "Basilika San Nicola",
+                coords: [41.1303, 16.8719],
+                description: "Wichtige Pilgerkirche mit den Reliquien des Heiligen Nikolaus, Schutzpatron der Stadt.",
+                visitors: "1 Million Besucher/Jahr",
+                wikipedia: "https://de.wikipedia.org/wiki/Basilika_San_Nicola"
+            },
+            {
+                name: "Bari Altstadt (Bari Vecchia)",
+                coords: [41.1286, 16.8694],
+                description: "Mittelalterliches Viertel mit engen Gassen, historischen Kirchen und lebendiger Atmosphäre.",
+                visitors: "2 Millionen Besucher/Jahr",
+                wikipedia: "https://de.wikipedia.org/wiki/Bari#Altstadt"
+            },
+            {
+                name: "Castello Svevo",
+                coords: [41.1292, 16.8678],
+                description: "Staufische Burg aus dem 12. Jahrhundert mit wechselvoller Geschichte und Museum.",
+                visitors: "300.000 Besucher/Jahr",
+                wikipedia: "https://de.wikipedia.org/wiki/Castello_Svevo_(Bari)"
+            },
+            {
+                name: "Kathedrale San Sabino",
+                coords: [41.1278, 16.8694],
+                description: "Romanische Kathedrale aus dem 12. Jahrhundert mit beeindruckender Krypta.",
+                visitors: "500.000 Besucher/Jahr",
+                wikipedia: "https://de.wikipedia.org/wiki/Kathedrale_von_Bari"
+            },
+            {
+                name: "Lungomare Nazario Sauro",
+                coords: [41.1256, 16.8761],
+                description: "Prachtvolle Uferpromenade mit Blick auf die Adria und beliebt zum Flanieren.",
+                visitors: "1,5 Millionen Besucher/Jahr",
+                wikipedia: "https://de.wikipedia.org/wiki/Bari#Stadtbild"
+            },
+            {
+                name: "Petruzzelli-Theater",
+                coords: [41.1236, 16.8717],
+                description: "Italiens viertgrößtes Opernhaus, bekannt für exzellente Akustik und prächtiges Interieur.",
+                visitors: "200.000 Besucher/Jahr",
+                wikipedia: "https://de.wikipedia.org/wiki/Teatro_Petruzzelli"
+            },
+            {
+                name: "Piazza Mercantile",
+                coords: [41.1278, 16.8714],
+                description: 'Historischer Marktplatz mit "Säule der Gerechtigkeit" und lebhaften Cafés.',
+                visitors: "800.000 Besucher/Jahr",
+                wikipedia: "https://de.wikipedia.org/wiki/Bari#Piazza_Mercantile"
+            },
+            {
+                name: "Pinacoteca Provinciale",
+                coords: [41.1247, 16.8681],
+                description: "Kunstmuseum mit Werken apulischer Künstler vom Mittelalter bis ins 19. Jahrhundert.",
+                visitors: "100.000 Besucher/Jahr",
+                wikipedia: "https://de.wikipedia.org/wiki/Bari#Kunst_und_Kultur"
+            },
+            {
+                name: "San Ferdinando",
+                coords: [41.1239, 16.8664],
+                description: "Neoklassizistische Kirche mit beeindruckender Kuppel und reicher Innenausstattung.",
+                visitors: "150.000 Besucher/Jahr",
+                wikipedia: "https://de.wikipedia.org/wiki/Bari#Kirchen"
+            },
+            {
+                name: "Fischmarkt (Mercato del Pesce)",
+                coords: [41.1269, 16.8736],
+                description: "Authentischer Markt mit frischem Fisch und Meeresfrüchten direkt am Hafen.",
+                visitors: "600.000 Besucher/Jahr",
+                wikipedia: "https://de.wikipedia.org/wiki/Bari#Wirtschaft"
+            }
+        ];
+
+        // Gelbe Markierung erstellen
+        const YellowIcon = L.divIcon({
+            html: '<div class="yellow-marker"></div>',
+            className: 'yellow-marker-icon',
+            iconSize: [24, 24],
+            iconAnchor: [12, 24],
+            popupAnchor: [0, -24]
+        });
+
+        // Array für alle Marker
+        const markers = [];
+        let activePopup = null;
+
+        // Funktion zur Überprüfung der Titelüberlappung
+        function checkTitleOverlap() {
+            if (!activePopup) {
+                titleElement.classList.remove('hidden');
+                return;
+            }
+
+            const titleRect = titleElement.getBoundingClientRect();
+            const popupRect = activePopup._container.getBoundingClientRect();
+
+            const overlap = !(titleRect.right < popupRect.left || 
+                             titleRect.left > popupRect.right || 
+                             titleRect.bottom < popupRect.top || 
+                             titleRect.top > popupRect.bottom);
+
+            if (overlap) {
+                titleElement.classList.add('hidden');
+            } else {
+                titleElement.classList.remove('hidden');
+            }
+        }
+
+        // Markierungen hinzufügen
+        landmarks.forEach(landmark => {
+            const marker = L.marker(landmark.coords, { 
+                icon: YellowIcon,
+                interactive: true,
+                riseOnHover: true
+            }).addTo(map);
+            
+            const popupContent = `
+                <div class="landmark-info">
+                    <h3>${landmark.name}</h3>
+                    <p>${landmark.description}</p>
+                    <p><strong>Besucher pro Jahr:</strong> ${landmark.visitors}</p>
+                    <p><a href="${landmark.wikipedia}" target="_blank">Wikipedia →</a></p>
+                </div>
+            `;
+            
+            marker.bindPopup(popupContent);
+            marker.on('popupopen', function() {
+                activePopup = marker.getPopup();
+                checkTitleOverlap();
+            });
+            marker.on('popupclose', function() {
+                activePopup = null;
+                titleElement.classList.remove('hidden');
+            });
+            
+            markers.push(marker);
+        });
+
+        // Karte so zoomen, dass alle Marker sichtbar sind
+        const group = new L.featureGroup(markers);
+        map.fitBounds(group.getBounds().pad(0.2)); // 20% padding um die Marker
+
+        // Überlappung bei Bewegung der Karte überprüfen
+        map.on('move', checkTitleOverlap);
+        map.on('moveend', checkTitleOverlap);
+
+        // Orientierungswechsel bei Mobilgeräten behandeln
+        window.addEventListener('resize', function() {
+            checkTitleOverlap();
+        });
+    </script>
+</body>
+</html>

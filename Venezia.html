@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <title>Top 10 Sehenswürdigkeiten in Venedig</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+        #map {
+            width: 100%;
+            height: 100vh;
+        }
+        .landmark-info {
+            max-width: 250px;
+        }
+        .landmark-info h3 {
+            margin-top: 0;
+            color: #2c3e50;
+        }
+        .yellow-marker {
+            position: absolute;
+            width: 24px;
+            height: 24px;
+            left: -12px;
+            top: -12px;
+            transform: rotate(45deg);
+            background: #FFD700;
+            border: 2px solid #FFA500;
+            border-radius: 24px 24px 0;
+        }
+        .yellow-marker::after {
+            content: "";
+            width: 10px;
+            height: 10px;
+            margin: 7px 0 0 7px;
+            background: #FFFFFF;
+            position: absolute;
+            border-radius: 50%;
+        }
+        .copyright {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            background: rgba(255, 255, 255, 0.7);
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 0.8em;
+            z-index: 1000;
+        }
+        .leaflet-control-layers {
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 5px;
+            padding: 5px;
+        }
+        .map-title {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            font-size: 1.5em;
+            font-weight: bold;
+            text-shadow: 1px 1px 2px white;
+            padding: 8px 15px;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 5px;
+            white-space: nowrap;
+            transition: opacity 0.3s ease;
+        }
+        .map-title.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        /* Subtle scale bar styling */
+        .leaflet-control-scale {
+            background: none;
+            border: none;
+            box-shadow: none;
+            margin-bottom: 5px;
+            margin-right: 5px;
+        }
+        .leaflet-control-scale-line {
+            background: rgba(255, 255, 255, 0.5);
+            border: 1px solid #777;
+            border-top: none;
+            color: #333;
+            font-size: 0.7em;
+            line-height: 1.1;
+            padding: 2px 4px;
+        }
+        @media (max-width: 768px) and (orientation: portrait) {
+            .map-title {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+    <div class="map-title">Top 10 Sehenswürdigkeiten in Venedig</div>
+    <div class="copyright">©Stefan Georg Ackermann</div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    
+    <script>
+        // Karte zentriert auf Venedig
+        const map = L.map('map').setView([45.4372, 12.3346], 14);
+        const titleElement = document.querySelector('.map-title');
+
+        // Kartenlayer definieren
+        const satelliteLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+            attribution: 'Kartenbild © Esri',
+            name: 'Satellitenansicht'
+        });
+
+        const osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> Mitwirkende',
+            name: 'Straßenkarte'
+        });
+
+        // Standardmäßig Satellitenlayer anzeigen
+        satelliteLayer.addTo(map);
+
+        // Layer-Steuerung hinzufügen
+        const baseLayers = {
+            "Satellitenansicht": satelliteLayer,
+            "OpenStreetMap": osmLayer
+        };
+        
+        L.control.layers(baseLayers, null, {position: 'topright'}).addTo(map);
+
+        // Subtile Maßstabsleiste in Kilometern (unten rechts)
+        L.control.scale({
+            position: 'bottomright',
+            metric: true,
+            imperial: false,
+            maxWidth: 100
+        }).addTo(map);
+
+        // Top 10 Sehenswürdigkeiten in Venedig
+        const landmarks = [
+            {
+                name: "Piazza San Marco",
+                coords: [45.4340, 12.3387],
+                description: "Der berühmte Markusplatz mit Basilika, Campanile und Dogenpalast - das Herz Venedigs.",
+                visitors: "20 Millionen Besucher/Jahr",
+                wikipedia: "https://de.wikipedia.org/wiki/Markusplatz"
+            },
+            {
+                name: "Dogenpalast",
+                coords: [45.4339, 12.3404],
+                description: "Prunkvoller Regierungssitz der ehemaligen Republik Venedig mit Seufzerbrücke.",
+                visitors: "1,5 Millionen Besucher/Jahr",
+                wikipedia: "https://de.wikipedia.org/wiki/Dogenpalast"
+            },
+            {
+                name: "Rialtobrücke",
+                coords: [45.4380, 12.3359],
+                description: "Ikone der Renaissance-Architektur und älteste Brücke über den Canal Grande.",
+                visitors: "15 Millionen Besucher/Jahr",
+                wikipedia: "https://de.wikipedia.org/wiki/Rialtobrücke"
+            },
+            {
+                name: "Basilika San Marco",
+                coords: [45.4345, 12.3399],
+                description: "Prachtvolle byzantinische Kirche mit goldenen Mosaiken und den Markus-Reliquien.",
+                visitors: "5 Millionen Besucher/Jahr",
+                wikipedia: "https://de.wikipedia.org/wiki/Markusdom"
+            },
+            {
+                name: "Campanile di San Marco",
+                coords: [45.4340, 12.3394],
+                description: "Der 98m hohe Glockenturm mit spektakulärem Panoramablick über die Stadt.",
+                visitors: "2 Millionen Besucher/Jahr",
+                wikipedia: "https://de.wikipedia.org/wiki/Campanile_(Venedig)"
+            },
+            {
+                name: "Gallerie dell'Accademia",
+                coords: [45.4315, 12.3284],
+                description: "Wichtigstes Kunstmuseum Venedigs mit Meisterwerken venezianischer Malerei.",
+                visitors: "800.000 Besucher/Jahr",
+                wikipedia: "https://de.wikipedia.org/wiki/Gallerie_dell’Accademia"
+            },
+            {
+                name: "Peggy Guggenheim Collection",
+                coords: [45.4308, 12.3329],
+                description: "Modernes Kunstmuseum mit Werken von Picasso, Dalí und Pollock in einem Palazzo am Canal Grande.",
+                visitors: "400.000 Besucher/Jahr",
+                wikipedia: "https://de.wikipedia.org/wiki/Peggy_Guggenheim_Collection"
+            },
+            {
+                name: "Murano",
+                coords: [45.4588, 12.3566],
+                description: "Berühmte Insel für Glasbläserkunst mit historischen Glashütten und Museen.",
+                visitors: "3 Millionen Besucher/Jahr",
+                wikipedia: "https://de.wikipedia.org/wiki/Murano"
+            },
+            {
+                name: "Burano",
+                coords: [45.4858, 12.4165],
+                description: "Bunte Fischerinsel mit Spitzenklöppelei-Tradition und malerischen Häusern.",
+                visitors: "2,5 Millionen Besucher/Jahr",
+                wikipedia: "https://de.wikipedia.org/wiki/Burano"
+            },
+            {
+                name: "Teatro La Fenice",
+                coords: [45.4336, 12.3339],
+                description: "Legendäres Opernhaus, das wie ein Phönix aus der Asche mehrfach wiederaufgebaut wurde.",
+                visitors: "300.000 Besucher/Jahr",
+                wikipedia: "https://de.wikipedia.org/wiki/Teatro_La_Fenice"
+            }
+        ];
+
+        // Gelbe Markierung erstellen
+        const YellowIcon = L.divIcon({
+            html: '<div class="yellow-marker"></div>',
+            className: 'yellow-marker-icon',
+            iconSize: [24, 24],
+            iconAnchor: [12, 24],
+            popupAnchor: [0, -24]
+        });
+
+        // Array für alle Marker
+        const markers = [];
+        let activePopup = null;
+
+        // Funktion zur Überprüfung der Titelüberlappung
+        function checkTitleOverlap() {
+            if (!activePopup) {
+                titleElement.classList.remove('hidden');
+                return;
+            }
+
+            const titleRect = titleElement.getBoundingClientRect();
+            const popupRect = activePopup._container.getBoundingClientRect();
+
+            const overlap = !(titleRect.right < popupRect.left || 
+                             titleRect.left > popupRect.right || 
+                             titleRect.bottom < popupRect.top || 
+                             titleRect.top > popupRect.bottom);
+
+            if (overlap) {
+                titleElement.classList.add('hidden');
+            } else {
+                titleElement.classList.remove('hidden');
+            }
+        }
+
+        // Markierungen hinzufügen
+        landmarks.forEach(landmark => {
+            const marker = L.marker(landmark.coords, { 
+                icon: YellowIcon,
+                interactive: true,
+                riseOnHover: true
+            }).addTo(map);
+            
+            const popupContent = `
+                <div class="landmark-info">
+                    <h3>${landmark.name}</h3>
+                    <p>${landmark.description}</p>
+                    <p><strong>Besucher pro Jahr:</strong> ${landmark.visitors}</p>
+                    <p><a href="${landmark.wikipedia}" target="_blank">Wikipedia →</a></p>
+                </div>
+            `;
+            
+            marker.bindPopup(popupContent);
+            marker.on('popupopen', function() {
+                activePopup = marker.getPopup();
+                checkTitleOverlap();
+            });
+            marker.on('popupclose', function() {
+                activePopup = null;
+                titleElement.classList.remove('hidden');
+            });
+            
+            markers.push(marker);
+        });
+
+        // Karte so zoomen, dass alle Marker sichtbar sind
+        const group = new L.featureGroup(markers);
+        map.fitBounds(group.getBounds().pad(0.2)); // 20% padding um die Marker
+
+        // Überlappung bei Bewegung der Karte überprüfen
+        map.on('move', checkTitleOverlap);
+        map.on('moveend', checkTitleOverlap);
+
+        // Orientierungswechsel bei Mobilgeräten behandeln
+        window.addEventListener('resize', function() {
+            checkTitleOverlap();
+        });
+    </script>
+</body>
+</html>
